@@ -164,27 +164,15 @@ SalesData-ETL/
 
 ### Data Flow
 
-Add screenshot:
-
-```text
-screenshots/dataflowCanvas.png
-```
+![DataFlow](screenshots/dataflowCanvas.png)
 
 ### Monitoring
 
-Add screenshot:
-
-```text
-screenshots/PipelineRunSuccessful.png
-```
+![Monitoring](screenshots/PipelineRunSuccessful.png)
 
 ### Storage
 
-Add screenshot:
-
-```text
-screenshots/storageAccount.png
-```
+![Storage](screenshots/storageAccount.png)
 
 ---
 
