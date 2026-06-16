@@ -5,20 +5,12 @@
 			"referenceName": "ls_adls_sales",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"FileName": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "dataset().FileName",
-					"type": "Expression"
-				},
+				"fileName": "superstore_sales.csv",
 				"fileSystem": "raw"
 			},
 			"columnDelimiter": ",",
