@@ -1,0 +1,23 @@
+{
+	"name": "ds_superstore_processed",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_sales",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "superstore_sales_cleaned.csv",
+				"fileSystem": "processed"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
