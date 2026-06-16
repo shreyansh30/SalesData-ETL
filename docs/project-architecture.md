@@ -1,15 +1,26 @@
-# Sales Data ETL Pipeline Architecture
+# Sales Data ETL Pipeline
 
-Source:
-Sales CSV Files
+## Source
+Superstore Sales CSV
 
-Processing:
-Azure Data Factory
-- Copy Activity
-- Data Flow (Cleaning)
-
-Destination:
+## Storage
 Azure Data Lake Storage Gen2
 
-Automation:
-ADF Trigger
+Containers:
+- raw
+- processed
+
+## Processing
+Azure Data Factory
+
+Transformations:
+- Remove null values
+- Remove duplicates
+- Standardize date formats
+- Filter invalid sales records
+
+## Output
+Processed sales dataset stored in ADLS Gen2
+
+## Automation
+ADF Schedule Trigger
