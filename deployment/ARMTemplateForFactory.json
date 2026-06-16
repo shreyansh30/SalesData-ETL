@@ -1,0 +1,312 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+            "defaultValue": "salesdata-etl"
+        },
+        "ls_adls_sales_accountKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'accountKey' of 'ls_adls_sales'"
+        },
+        "ls_adls_sales_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://salesdataetl.dfs.core.windows.net/"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/pl_copy_superstore_sales')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Data flow1",
+                        "type": "ExecuteDataFlow",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataflow": {
+                                "referenceName": "df_clean_superstore_sales",
+                                "type": "DataFlowReference",
+                                "parameters": {},
+                                "datasetParameters": {
+                                    "source1": {},
+                                    "sink1": {}
+                                }
+                            },
+                            "staging": {},
+                            "compute": {
+                                "coreCount": 8,
+                                "computeType": "General"
+                            },
+                            "traceLevel": "Fine"
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/dataflows/df_clean_superstore_sales')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_superstore_processed')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_adls_sales",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "superstore_sales_cleaned.csv",
+                        "fileSystem": "processed"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_adls_sales')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ds_superstore_source')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "ls_adls_sales",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "superstore_sales.csv",
+                        "fileSystem": "raw"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "Row ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Order ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Order Date",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Ship Date",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Ship Mode",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Customer ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Customer Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Segment",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Country",
+                        "type": "String"
+                    },
+                    {
+                        "name": "City",
+                        "type": "String"
+                    },
+                    {
+                        "name": "State",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Postal Code",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Region",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Product ID",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Category",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Sub-Category",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Product Name",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Sales",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Quantity",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Discount",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Profit",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/ls_adls_sales')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/ls_adls_sales')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobFS",
+                "typeProperties": {
+                    "url": "[parameters('ls_adls_sales_properties_typeProperties_url')]",
+                    "accountKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('ls_adls_sales_accountKey')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/df_clean_superstore_sales')]",
+            "type": "Microsoft.DataFactory/factories/dataflows",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "type": "MappingDataFlow",
+                "typeProperties": {
+                    "sources": [
+                        {
+                            "dataset": {
+                                "referenceName": "ds_superstore_source",
+                                "type": "DatasetReference"
+                            },
+                            "name": "source1"
+                        }
+                    ],
+                    "sinks": [
+                        {
+                            "dataset": {
+                                "referenceName": "ds_superstore_processed",
+                                "type": "DatasetReference"
+                            },
+                            "name": "sink1"
+                        }
+                    ],
+                    "transformations": [
+                        {
+                            "name": "filtersales"
+                        },
+                        {
+                            "name": "filterNull"
+                        },
+                        {
+                            "name": "drvProfitMargin"
+                        }
+                    ],
+                    "scriptLines": [
+                        "source(output(",
+                        "          {Row ID} as string,",
+                        "          {Order ID} as string,",
+                        "          {Order Date} as string,",
+                        "          {Ship Date} as string,",
+                        "          {Ship Mode} as string,",
+                        "          {Customer ID} as string,",
+                        "          {Customer Name} as string,",
+                        "          Segment as string,",
+                        "          Country as string,",
+                        "          City as string,",
+                        "          State as string,",
+                        "          {Postal Code} as string,",
+                        "          Region as string,",
+                        "          {Product ID} as string,",
+                        "          Category as string,",
+                        "          {Sub-Category} as string,",
+                        "          {Product Name} as string,",
+                        "          Sales as string,",
+                        "          Quantity as string,",
+                        "          Discount as string,",
+                        "          Profit as string",
+                        "     ),",
+                        "     allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     ignoreNoFilesFound: false) ~> source1",
+                        "source1 filter(toInteger(Sales) > 0) ~> filtersales",
+                        "filtersales filter(!isNull({Customer Name})) ~> filterNull",
+                        "filterNull derive(ProfitMargin = (toDecimal(Profit) / toDecimal(Sales)) * 100,",
+                        "          SalesCategory = iif(toDecimal(Sales) >= 500, 'High Value', 'Regular')) ~> drvProfitMargin",
+                        "drvProfitMargin sink(allowSchemaDrift: true,",
+                        "     validateSchema: false,",
+                        "     partitionFileNames:['superstore_sales_transformed.csv'],",
+                        "     umask: 0022,",
+                        "     preCommands: [],",
+                        "     postCommands: [],",
+                        "     skipDuplicateMapInputs: true,",
+                        "     skipDuplicateMapOutputs: true,",
+                        "     partitionBy('hash', 1)) ~> sink1"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/ds_superstore_source')]",
+                "[concat(variables('factoryId'), '/datasets/ds_superstore_processed')]"
+            ]
+        }
+    ]
+}
