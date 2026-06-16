@@ -1,0 +1,15 @@
+{
+	"name": "salesdata-etl",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "13e489ab-7221-4131-b0b5-862ff419fdee",
+		"tenantId": "b64e29a9-96c1-47c4-b967-f2b5cf4dd326"
+	}
+}
