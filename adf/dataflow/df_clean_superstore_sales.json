@@ -33,6 +33,9 @@
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     FileName as string",
+				"}",
 				"source(output(",
 				"          {Row ID} as string,",
 				"          {Order ID} as string,",

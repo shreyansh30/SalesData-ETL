@@ -27,6 +27,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"FileName": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
