@@ -159,11 +159,8 @@ SalesData-ETL/
 
 ### Pipeline
 
-Add screenshot:
+![Pipeline](screenshots/pipelineCanvas.png)
 
-```text
-screenshots/pipelineCanvas.png
-```
 
 ### Data Flow
 
