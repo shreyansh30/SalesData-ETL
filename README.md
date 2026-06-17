@@ -174,6 +174,14 @@ SalesData-ETL/
 
 ![Storage](screenshots/storageAccount.png)
 
+### Pre-Processed Data
+
+![Pre](screenshots/preProccessedData.png)
+
+### Pre-Processed Data
+
+![Post](screenshots/postProccessingData.png)
+
 ---
 
 ## Deployment
