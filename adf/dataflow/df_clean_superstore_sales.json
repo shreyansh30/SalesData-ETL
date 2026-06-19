@@ -98,7 +98,8 @@
 				"          Profit,",
 				"          {Profit Margin},",
 				"          {Discount Category},",
-				"          {Revenue per Unit}",
+				"          {Revenue per Unit},",
+				"          {Profit per Unit}",
 				"     ),",
 				"     partitionBy('hash', 1)) ~> sink1"
 			]
