@@ -29,7 +29,7 @@
 					"name": "filterNull"
 				},
 				{
-					"name": "drvProfitMargin"
+					"name": "drvBusinessMetrics"
 				}
 			],
 			"scriptLines": [
@@ -61,9 +61,12 @@
 				"     ignoreNoFilesFound: false) ~> source1",
 				"source1 filter(toInteger(Sales) > 0) ~> filtersales",
 				"filtersales filter(!isNull({Customer Name})) ~> filterNull",
-				"filterNull derive(ProfitMargin = (toDecimal(Profit) / toDecimal(Sales)) * 100,",
-				"          SalesCategory = iif(toDecimal(Sales) >= 500, 'High Value', 'Regular')) ~> drvProfitMargin",
-				"drvProfitMargin sink(allowSchemaDrift: true,",
+				"filterNull derive({Profit Margin} = round((toDecimal(Profit)/toDecimal(Sales))*100, 1),",
+				"          {Discount Category} = iif(toDecimal(Discount)==0,'No Discount',     iif(toDecimal(Discount)<=0.2,'Low Discount',         'High Discount')),",
+				"          {Revenue per Unit} = round(toDecimal(Sales)/toInteger(Quantity),2),",
+				"          Discount = round(toDecimal(Discount) * 100, 0),",
+				"          {Profit per Unit} = round(toDecimal(Profit)/toInteger(Quantity),2)) ~> drvBusinessMetrics",
+				"drvBusinessMetrics sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     partitionFileNames:['superstore_sales_transformed.csv'],",
 				"     umask: 0022,",
@@ -71,6 +74,32 @@
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          {Row ID},",
+				"          {Order ID},",
+				"          {Order Date},",
+				"          {Ship Date},",
+				"          {Ship Mode},",
+				"          {Customer ID},",
+				"          {Customer Name},",
+				"          Segment,",
+				"          Country,",
+				"          City,",
+				"          State,",
+				"          {Postal Code},",
+				"          Region,",
+				"          {Product ID},",
+				"          Category,",
+				"          {Sub-Category},",
+				"          {Product Name},",
+				"          Sales,",
+				"          Quantity,",
+				"          {Discount(%)} = Discount,",
+				"          Profit,",
+				"          {Profit Margin},",
+				"          {Discount Category},",
+				"          {Revenue per Unit}",
+				"     ),",
 				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
