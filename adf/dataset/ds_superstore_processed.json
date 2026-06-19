@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "superstore_sales_transformed.csv",
 				"fileSystem": "processed"
 			},
 			"columnDelimiter": ",",
