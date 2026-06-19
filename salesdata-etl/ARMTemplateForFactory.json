@@ -80,7 +80,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "superstore_sales_cleaned.csv",
 						"fileSystem": "processed"
 					},
 					"columnDelimiter": ",",
@@ -257,7 +256,7 @@
 							"name": "filterNull"
 						},
 						{
-							"name": "drvProfitMargin"
+							"name": "drvBusinessMetrics"
 						}
 					],
 					"scriptLines": [
@@ -289,11 +288,26 @@
 						"     ignoreNoFilesFound: false) ~> source1",
 						"source1 filter(toInteger(Sales) > 0) ~> filtersales",
 						"filtersales filter(!isNull({Customer Name})) ~> filterNull",
-						"filterNull derive(ProfitMargin = (toDecimal(Profit) / toDecimal(Sales)) * 100,",
-						"          SalesCategory = iif(toDecimal(Sales) >= 500, 'High Value', 'Regular')) ~> drvProfitMargin",
-						"drvProfitMargin sink(allowSchemaDrift: true,",
+						"filterNull derive(Discount = round(toDecimal(Discount) * 100, 0),",
+						"          {Profit Margin} = round((toDecimal(Profit)/toDecimal(Sales))*100, 1),",
+						"          {Discount Category} = iif(\r",
+						"    toDecimal(Discount)==0,\r",
+						"    'No Discount',\r",
+						"    iif(\r",
+						"        toDecimal(Discount)<=0.2,\r",
+						"        'Low Discount',\r",
+						"        iif(\r",
+						"            toDecimal(Discount)<=0.5,\r",
+						"            'Medium Discount',\r",
+						"            'High Discount'\r",
+						"        )\r",
+						"    )\r",
+						"),",
+						"          {Revenue per Unit} = round(toDecimal(Sales)/toInteger(Quantity),2),",
+						"          {Profit per Unit} = round(toDecimal(Profit)/toInteger(Quantity),2)) ~> drvBusinessMetrics",
+						"drvBusinessMetrics sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     partitionFileNames:['superstore_sales_transformed.csv'],",
+						"     partitionFileNames:['superstore_sales_updated.csv'],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
