@@ -1,135 +1,110 @@
-# Sales Data ETL Pipeline using Azure Data Factory
+# SalesData-ETL: Azure Data Factory ETL Pipeline for Retail Sales Analytics
 
 ## Overview
 
-This project demonstrates the development of an end-to-end ETL (Extract, Transform, Load) pipeline using Azure Data Factory (ADF) and Azure Data Lake Storage Gen2 (ADLS Gen2).
+**SalesData-ETL** is an end-to-end cloud ETL project built with **Azure Data Factory (ADF)** and **Azure Data Lake Storage Gen2 (ADLS Gen2)**.
 
-The pipeline ingests raw sales data from CSV files, performs data quality checks and transformations, and stores the processed data in a separate location for downstream analytics and reporting.
+The pipeline ingests raw Superstore sales data (CSV), applies business-focused transformations and data quality checks through **Mapping Data Flows**, and writes curated output for downstream analytics and reporting.
 
 ---
 
-## Project Architecture
+## Problem Statement
+
+Raw retail sales data often contains:
+- Inconsistent discount representation
+- Missing customer information
+- Invalid sales records
+- Limited business-ready metrics for decision-making
+
+This project solves these issues by creating a reliable, analytics-ready processed dataset with derived KPIs and standardized business categories.
+
+---
+
+## Solution Architecture
+
+### High-Level Flow
 
 ```text
-Raw Sales CSV
-      ↓
-Azure Data Lake Storage Gen2 (raw)
-      ↓
+Raw Sales CSV (Superstore dataset)
+        ↓
+ADLS Gen2 (raw container)
+        ↓
 Azure Data Factory Pipeline
-      ↓
-Mapping Data Flow
-    • Filter invalid sales records
-    • Remove records with missing customer information
-    • Create Profit Margin metric
-    • Categorize sales transactions
-      ↓
-Azure Data Lake Storage Gen2 (processed)
-      ↓
-Processed Sales Dataset
+        ↓
+Mapping Data Flow Transformations
+   - Data quality filtering
+   - Derived KPI creation
+   - Discount standardization and categorization
+        ↓
+ADLS Gen2 (processed container)
+        ↓
+Curated Sales Dataset for BI / Reporting
 ```
 
 ---
 
-## Technologies Used
+## Tech Stack
 
-* Azure Data Factory (ADF)
-* Azure Data Lake Storage Gen2 (ADLS Gen2)
-* GitHub
-* ARM Templates
-* CSV Dataset
+- **Azure Data Factory (ADF)**
+- **Azure Data Lake Storage Gen2 (ADLS Gen2)**
+- **Mapping Data Flows**
+- **GitHub**
+- **ARM Templates** (for deployment and infra backup)
+- **CSV Data Source (Superstore Sales Dataset)**
 
 ---
 
 ## Dataset
 
-Source dataset: Superstore Sales Dataset
-
-The dataset contains retail sales information including:
-
-* Orders
-* Customers
-* Products
-* Sales
-* Profit
-* Geographic information
+Source: **Superstore Sales Dataset**  
+Contains retail attributes such as:
+- Order details
+- Customer details
+- Product details
+- Sales, Profit, Discount, Quantity
+- Region/Geography fields
 
 ---
 
-## ETL Process
+## ETL Pipeline Stages
 
-### Extract
+## 1) Extract
+- Source file read from `raw` container in ADLS Gen2.
+- Connected through ADF linked services and datasets.
 
-* Read source CSV file from the `raw` container in ADLS Gen2.
-* Import data through Azure Data Factory datasets and linked services.
+## 2) Transform (Mapping Data Flow)
 
-### Transform
+### Data Quality Rules
+1. **Filter invalid sales records**
+   - Keep records where `Sales > 0`
+2. **Remove incomplete customer records**
+   - Exclude rows where required customer fields (e.g., `Customer Name`) are null
 
-The Mapping Data Flow performs the following transformations:
+### Business Transformations
+1. **Profit Margin (%)**
+   - Formula: `(Profit / Sales) * 100`
+   - Rounded to **2 decimal places**
 
-#### 1. Sales Validation
+2. **Discount Standardization**
+   - Convert discount from decimal to percentage scale  
+   - Example: `0.2 → 20`, `0.4 → 40`
 
-Removes records with invalid sales values.
+3. **Discount Category**
+   - Bucket records into:
+     - No Discount
+     - Low Discount
+     - Medium Discount
+     - High Discount
 
-```text
-Sales > 0
-```
+4. **Revenue Per Unit**
+   - Formula: `Sales / Quantity`
 
-#### 2. Null Handling
+5. **Profit Per Unit**
+   - Formula: `Profit / Quantity`
 
-Removes records with missing customer information.
-
-```text
-Customer Name IS NOT NULL
-```
-
-#### 3. Derived Metric
-
-Creates a Profit Margin column.
-
-```text
-ProfitMargin = (Profit / Sales) * 100
-```
-
-#### 4. Sales Categorization
-
-Creates a business-friendly sales category.
-
-```text
-High Value
-Regular
-```
-
-### Load
-
-Stores transformed data in the `processed` container of ADLS Gen2.
-
-Output file:
-
-```text
-superstore_sales_transformed.csv
-```
-
----
-
-## Azure Resources
-
-### Resource Group
-
-```text
-rg-salesdata-etl
-```
-
-### Storage Account
-
-```text
-salesdataetl_1781609692282
-```
-
-### Azure Data Factory
-
-```text
-salesdata-etl
-```
+## 3) Load
+- Transformed data written to the `processed` container in ADLS Gen2.
+- Output file is analytics-ready for BI tools and SQL-based analysis.
 
 ---
 
@@ -138,86 +113,56 @@ salesdata-etl
 ```text
 SalesData-ETL/
 │
-├── adf/
+├── adf/                      # ADF artifacts (pipelines, dataflows, datasets, linked services)
 ├── data/
 │   └── raw/
 │       └── superstore_sales.csv
-│
-├── deployment/
-│
+├── deployment/               # ARM templates
 ├── docs/
 │   └── project-architecture.md
-│
 ├── screenshots/
-│
 └── README.md
 ```
 
 ---
 
-## Screenshots
+## Azure Resources
 
-### Pipeline
+- **Resource Group:** `rg-salesdata-etl`
+- **Storage Account:** `salesdataetl_1781609692282`
+- **Data Factory:** `salesdata-etl`
 
-![Pipeline](screenshots/pipelineCanvas.png)
+---
 
+## Key Business Outcomes
 
-### Data Flow
-
-![DataFlow](screenshots/dataflowCanvas.png)
-
-### Monitoring
-
-![Monitoring](screenshots/PipelineRunSuccessful.png)
-
-### Storage
-
-![Storage](screenshots/storageAccount.png)
-
-### Pre-Processed Data
-
-![Pre](screenshots/preProccessedData.png)
-
-### Pre-Processed Data
-
-![Post](screenshots/postProccessingData.png)
+- Improved data reliability via quality filters
+- Standardized discount metrics for easier reporting
+- Added unit-level and margin KPIs for profitability insights
+- Produced clean curated data for dashboards and analytics
 
 ---
 
 ## Deployment
 
-The repository includes ARM templates for redeploying Azure Data Factory resources.
-
-Location:
+Infrastructure and ADF assets can be redeployed using ARM templates under:
 
 ```text
 deployment/
 ```
 
-These templates can be used to recreate the Data Factory environment in another Azure subscription.
-
----
-
-## Key Learnings
-
-* Azure Data Factory Pipelines
-* Linked Services
-* Datasets
-* Mapping Data Flows
-* Data Transformation Techniques
-* Azure Data Lake Storage Gen2
-* Monitoring and Debugging ETL Workflows
-* Infrastructure Backup using ARM Templates
-* Source Control Integration with GitHub
-
 ---
 
 ## Future Enhancements
 
-* Event-based triggers for automatic file ingestion
-* Dynamic file processing through parameterized datasets
-* Loading transformed data into Azure SQL Database
-* Power BI dashboard integration
-* Incremental data processing
+- Event-triggered ingestion (file arrival-based automation)
+- Parameterized pipelines for multi-file processing
+- Incremental load strategy (watermark-based)
+- Load curated data into Azure SQL / Synapse
+- Power BI dashboard layer for executive reporting
 
 ---
+
+## Author
+
+Built by **Shreyansh** as a practical cloud data engineering project focused on ETL design, transformation logic, and analytics-ready data modeling.
