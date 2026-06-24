@@ -54,7 +54,8 @@
 						"fileSystem": "processed"
 					},
 					"columnDelimiter": ",",
-					"escapeChar": "\\",
+					"rowDelimiter": "\n",
+					"escapeChar": "\"",
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
